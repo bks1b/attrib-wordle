@@ -19,6 +19,7 @@ export default <T extends { [k in U]: string; } & { [k in string]: any; }, U ext
     const [input, setInput] = useState('');
     const inputRef = useRef<HTMLInputElement>(null);
     const [correct, setCorrect] = useState(entries[Math.floor(Math.random() * entries.length)]);
+    const [givenUp, setGivenUp] = useState(false);
     const [attempts, setAttempts] = useState<T[]>([]);
     const [dropdownIndex, setDropdownIndex] = useState<number | null>(null);
     const [options, setOptions] = useState<[string, number][]>([]);
@@ -33,10 +34,11 @@ export default <T extends { [k in U]: string; } & { [k in string]: any; }, U ext
     };
     const reset = () => {
         setCorrect(entries[Math.floor(Math.random() * entries.length)]);
+        setGivenUp(false);
         setAttempts([]);
     };
     const isCorrect = attempts.slice(-1)[0]?.[id] === correct[id];
-    const isOver = isCorrect || attempts.length === guesses;
+    const isOver = isCorrect || givenUp || attempts.length === guesses;
     const thead = <thead><tr>{attribs.map((x, i) => <th key={i}>{x.name}</th>)}</tr></thead>;
     return <>
         {
@@ -46,7 +48,7 @@ export default <T extends { [k in U]: string; } & { [k in string]: any; }, U ext
                 }}>
                     <div className='popup'>
                         <div className='popupHeader'>
-                            <a>{isCorrect ? 'Correct' : 'Out of guesses'}</a>
+                            <a>{isCorrect ? 'Correct' : givenUp ? 'Given up' : 'Out of guesses'}</a>
                             <Cross size={15} fn={reset}/>
                         </div>
                         <table className='table'>
@@ -110,6 +112,7 @@ export default <T extends { [k in U]: string; } & { [k in string]: any; }, U ext
                         }</div></td>;
                 })}</tr>)}</tbody>
             </table>
+            <button onClick={() => setGivenUp(true)}>Give up</button>
         </div>
     </>;
 };
